@@ -419,6 +419,7 @@ body {
     /* Stack dashboard vertically instead of side-by-side */
     .dashboard-grid {
         grid-template-columns: 1fr;
+        gap: 15px;
     }
 
     /* Reduce header size */
@@ -431,9 +432,11 @@ body {
     #main-nav {
         flex-wrap: wrap;
         gap: 8px;
+        padding: 10px;
     }
 
     .nav-button {
+        flex: 1 1 45%;
         font-size: 14px;
         padding: 8px 12px;
     }
@@ -441,7 +444,8 @@ body {
     /* Make calendar toolbar fit mobile */
     .fc .fc-toolbar {
         flex-direction: column;
-        gap: 6px;
+        align-items: center;
+        gap: 8px;
     }
 
     .fc .fc-toolbar-title {
@@ -451,6 +455,11 @@ body {
     /* Slightly larger calendar events for touch */
     .fc-event {
         font-size: 13px;
+        padding: 3px 6px;
+    }
+
+    #calendar {
+        padding: 10px;
     }
 
     /* Reduce iframe height so it fits better */
