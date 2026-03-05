@@ -405,3 +405,58 @@ body {
     color: #888888;
     font-weight: bold;
 }
+
+/* ===== MOBILE FIX ===== */
+
+@media (max-width: 700px) {
+
+    /* Make main content fill the screen */
+    #content {
+        width: 95%;
+        padding: 15px;
+    }
+
+    /* Stack dashboard vertically instead of side-by-side */
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* Reduce header size */
+    #main-header {
+        font-size: 22px;
+        padding: 15px 0;
+    }
+
+    /* Make nav buttons wrap to multiple lines */
+    #main-nav {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .nav-button {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    /* Make calendar toolbar fit mobile */
+    .fc .fc-toolbar {
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    .fc .fc-toolbar-title {
+        font-size: 18px;
+    }
+
+    /* Slightly larger calendar events for touch */
+    .fc-event {
+        font-size: 13px;
+    }
+
+    /* Reduce iframe height so it fits better */
+    .portfolio-frame,
+    .script-frame {
+        height: 600px;
+    }
+
+}
