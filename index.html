@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FTC Team Portal</title>
+    <meta charset="UTF-8">
+    
+    <!-- Link to this page's CSS file -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- Import Full Calendar-->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- ================= HEADER ================= -->
+    <!-- Top banner of the site -->
+    <header id="main-header">
+        FTC Portal - Foxbots
+    </header>
+
+
+    <!-- ================= NAVIGATION ================= -->
+    <!-- Navigation bar that holds page buttons -->
+    <nav id="main-nav">
+
+        <!-- Each button has an ID so JavaScript can attach behavior later -->
+        <button id="dashboardBtn" class="nav-button">Dashboard</button>
+        <button id="calendarBtn" class="nav-button">Calendar</button>
+        <button id="filesBtn" class="nav-button">Files</button>
+        <button id="portfolioBtn" class="nav-button">Portfolio</button>
+        <button id="scriptBtn" class="nav-button">Script</button>
+        <button id="ordersBtn" class="nav-button">Orders</button>
+
+    </nav>
+
+
+    <!-- ================= MAIN CONTENT AREA ================= -->
+    <!-- This is the dynamic area that will change with JavaScript -->
+    <main id="main-area">
+
+        <!-- This div is what JS will replace/update when switching pages -->
+        <div id="content">
+
+            <!-- Default landing content -->
+            <h2 id="page-title">Welcome to the Foxbots Portal</h2>
+
+            <!-- Optional paragraph area for dynamic text later -->
+            <p id="page-description">
+                Select a section above to get started.
+            </p>
+
+        </div>
+
+    </main>
+
+
+    <!-- Link to this page's JavaScript file and Full Calendar Access-->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/google-calendar@6.1.8/index.global.min.js"></script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+
+</body>
+</html>
