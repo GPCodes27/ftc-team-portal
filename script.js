@@ -267,10 +267,17 @@ calendarBtn.addEventListener("click", () => {
     setTimeout(() => {
         const calendarEl = document.getElementById('calendar');
 
+        const isMobile = window.innerWidth < 700;
         const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
+            initialView: isMobile ? 'listWeek' : 'dayGridMonth',
 
-            headerToolbar: {
+            headerToolbar: isMobile
+            ? {
+                left: 'prev,next',
+                center: 'title',
+                right: 'listWeek'
+            }
+            : {
                 left: 'prev,next today',
                 center: 'title',
                 right: 'dayGridMonth,timeGridWeek'
