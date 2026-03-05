@@ -1,4 +1,5 @@
 const API_KEY = 'AIzaSyD-umZd1axooWwfjJRJm03TQfq8ugMoy9c';
+const TEAM_PASSWORD = "foxbots25657";
 // ================= NAV SETUP =================
 
 const dashboardBtn = document.getElementById("dashboardBtn");
@@ -74,6 +75,16 @@ function renderDashboard() {
 
         </div>
     `;
+}
+
+function checkPassword() {
+
+    const entered = prompt("Enter Team Password");
+
+    if (entered !== TEAM_PASSWORD) {
+        alert("Incorrect password");
+        checkPassword();
+    }
 }
 
 
@@ -483,5 +494,6 @@ function loadSupplyRequests() {
         });
 }
 // Default page on load
+checkPassword();
 loadPage(renderDashboard, dashboardBtn);
 
