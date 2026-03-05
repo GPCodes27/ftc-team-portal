@@ -412,8 +412,8 @@ body {
 
     /* Make main content fill the screen */
     #content {
-        width: 85%;
-        padding: 15px;
+        width: 98%;
+        padding: 10px;
     }
 
     /* Stack dashboard vertically instead of side-by-side */
@@ -441,6 +441,10 @@ body {
         padding: 8px 12px;
     }
 
+    .fc {
+        font-size: 12px;
+    }
+
     /* Make calendar toolbar fit mobile */
     .fc .fc-toolbar {
         flex-direction: column;
@@ -459,13 +463,23 @@ body {
     }
 
     #calendar {
-        padding: 10px;
+        padding: 6px;
+        height: 75vh;
+    }
+
+    .fc-view-harness {
+        overflow-x: hidden;
     }
 
     /* Reduce iframe height so it fits better */
     .portfolio-frame,
     .script-frame {
         height: 600px;
+    }
+
+    .card {
+        padding: 8px;
+        margin-top: 10px;
     }
 
 }
