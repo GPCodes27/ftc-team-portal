@@ -284,7 +284,7 @@ calendarBtn.addEventListener("click", () => {
             },
 
             buttonText: {
-                today: 'Today',
+                today: 'guinea pig',
                 month: 'Month',
                 week: 'Week',
             },
