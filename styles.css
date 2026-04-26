@@ -538,29 +538,37 @@ body {
     font-size: 14px;
 }
 
-.attendance-member-name {
-    flex: 1;
-}
-
+/* Make the status visually dominant */
 .attendance-status-label {
     font-weight: bold;
-    margin-right: 6px;
+    margin-right: 4px;
 }
 
 .attendance-status-present {
+    font-weight: bold;
     color: #2e7d32;
+    font-size: 15px;
 }
 
 .attendance-status-absent {
+    font-weight: bold;
     color: #c62828;
+    font-size: 15px;
 }
 
+/* Make the buttons subtle */
 .attendance-status-btn {
-    padding: 4px 8px;
+    padding: 3px 6px;
     border-radius: 6px;
     border: none;
     cursor: pointer;
-    font-size: 12px;
+    font-size: 11px;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.attendance-status-btn:hover {
+    opacity: 1;
 }
 
 .attendance-btn-present {
@@ -578,7 +586,7 @@ body {
     color: #777;
 }
 
-/* Mobile layout for attendance */
+/* Mobile layout */
 @media (max-width: 700px) {
     .attendance-layout {
         grid-template-columns: 1fr;
