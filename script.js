@@ -13,6 +13,12 @@ const navButtons = [dashboardBtn, calendarBtn, filesBtn, portfolioBtn, scriptBtn
 
 const content = document.getElementById("content");
 
+// Attendance nav button (added)
+const attendanceBtn = document.getElementById("attendanceBtn");
+// Add it to the existing navButtons array without changing the original line
+navButtons.push(attendanceBtn);
+
+
 // ================= LOCATIONS ==================
 
 const LOCATION_MAP = {
@@ -234,6 +240,37 @@ function renderScript() {
     `;
 }
 
+function renderAttendance() {
+    return `
+        <h2 id="page-title">Attendance</h2>
+
+        <div class="attendance-layout">
+
+            <div class="attendance-section">
+                <h3>Meetings</h3>
+                <p class="attendance-section-desc">
+                    Team meetings: everyone is marked <strong>Present</strong> by default. Switch to Absent and give a reason if you miss a meeting.
+                </p>
+                <div id="attendanceMeetingsContainer">
+                    <p class="attendance-empty">Loading meetings...</p>
+                </div>
+            </div>
+
+            <div class="attendance-section">
+                <h3>Events</h3>
+                <p class="attendance-section-desc">
+                    Outreach, tournaments, and other events: everyone is marked <strong>Absent</strong> by default. Switch to Present if you attend.
+                </p>
+                <div id="attendanceEventsContainer">
+                    <p class="attendance-empty">Loading events...</p>
+                </div>
+            </div>
+
+        </div>
+    `;
+}
+
+
 
 // ================= PAGE LOADER =================
 
@@ -373,6 +410,12 @@ scriptBtn.addEventListener("click", () => {
     loadPage(renderScript, scriptBtn);
 });
 
+attendanceBtn.addEventListener("click", () => {
+    loadPage(renderAttendance, attendanceBtn);
+    initAttendancePage();
+});
+
+
 //google form stuff
 const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxL7I_aWeyeFm-kxzol4VwjDUHPquiuYZDG7QE-ZsIatmT6iaiY0I4Wqc788J6yeyT6KQ/exec";
 
@@ -500,6 +543,202 @@ function loadSupplyRequests() {
             });
         });
 }
+// ===== Attendance Helpers =====
+
+// Fetch team members from Google Sheets via Apps Script
+function fetchTeamMembers() {
+    // We reuse the same WEB_APP_URL, but ask for mode=members
+    return fetch(WEB_APP_URL + "?mode=members")
+        .then(res => res.json())
+        .then(data => {
+            // Expecting an array of objects with at least { Name }
+            if (!Array.isArray(data)) return [];
+            return data
+                .map(row => row.Name)
+                .filter(name => !!name);
+        })
+        .catch(() => []);
+}
+
+// Fetch upcoming events from Google Calendar for attendance
+function fetchAttendanceEvents() {
+    const now = new Date();
+    const nextMonth = new Date();
+    nextMonth.setDate(now.getDate() + 30);
+
+    const calendarId = '61cdcccee7a2174e5eb954440422208b0b09fee21209b49ad064c9821ac1ae20@group.calendar.google.com';
+
+    const url = `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${API_KEY}&timeMin=${now.toISOString()}&timeMax=${nextMonth.toISOString()}&singleEvents=true&orderBy=startTime`;
+
+    return fetch(url)
+        .then(res => res.json())
+        .then(data => {
+            if (!data.items) return [];
+            return data.items
+                .filter(ev => ev.status !== "cancelled")
+                .map(ev => {
+                    const start = new Date(ev.start.dateTime || ev.start.date);
+                    return {
+                        title: ev.summary || "(No title)",
+                        start: start
+                    };
+                });
+        })
+        .catch(() => []);
+}
+
+// Render attendance UI once data is loaded
+function initAttendancePage() {
+    const meetingsContainer = document.getElementById("attendanceMeetingsContainer");
+    const eventsContainer = document.getElementById("attendanceEventsContainer");
+
+    if (!meetingsContainer || !eventsContainer) return;
+
+    Promise.all([fetchTeamMembers(), fetchAttendanceEvents()])
+        .then(([members, events]) => {
+            // If no members, use placeholders
+            if (!members || members.length === 0) {
+                members = ["Member 1", "Member 2", "Member 3"];
+            }
+
+            const meetings = [];
+            const otherEvents = [];
+
+            events.forEach(ev => {
+                const lower = ev.title.toLowerCase();
+                if (lower.includes("team meeting")) {
+                    meetings.push(ev);
+                } else {
+                    otherEvents.push(ev);
+                }
+            });
+
+            // Render meetings
+            meetingsContainer.innerHTML = "";
+            if (meetings.length === 0) {
+                meetingsContainer.innerHTML = `<p class="attendance-empty">No upcoming team meetings.</p>`;
+            } else {
+                meetings.forEach(ev => {
+                    const card = createAttendanceEventCard(ev, members, "Meeting");
+                    meetingsContainer.appendChild(card);
+                });
+            }
+
+            // Render events
+            eventsContainer.innerHTML = "";
+            if (otherEvents.length === 0) {
+                eventsContainer.innerHTML = `<p class="attendance-empty">No upcoming events.</p>`;
+            } else {
+                otherEvents.forEach(ev => {
+                    const card = createAttendanceEventCard(ev, members, "Event");
+                    eventsContainer.appendChild(card);
+                });
+            }
+        });
+}
+
+// Create a DOM card for one event with member rows
+function createAttendanceEventCard(event, members, eventType) {
+    const card = document.createElement("div");
+    card.className = "attendance-event-card";
+
+    const titleEl = document.createElement("div");
+    titleEl.className = "attendance-event-title";
+    titleEl.textContent = event.title;
+
+    const timeEl = document.createElement("div");
+    timeEl.className = "attendance-event-time";
+    timeEl.textContent = event.start.toLocaleString();
+
+    const membersContainer = document.createElement("div");
+    membersContainer.className = "attendance-members";
+
+    members.forEach(memberName => {
+        const row = document.createElement("div");
+        row.className = "attendance-member-row";
+
+        const nameEl = document.createElement("span");
+        nameEl.className = "attendance-member-name";
+        nameEl.textContent = memberName;
+
+        const statusLabel = document.createElement("span");
+        statusLabel.className = "attendance-status-label";
+
+        const statusValue = document.createElement("span");
+
+        const toggleBtn = document.createElement("button");
+        toggleBtn.className = "attendance-status-btn";
+
+        // Default status: meetings -> Present, events -> Absent
+        let status = (eventType === "Meeting") ? "Present" : "Absent";
+
+        function updateUI() {
+            if (status === "Present") {
+                statusValue.textContent = "Present";
+                statusValue.className = "attendance-status-present";
+                toggleBtn.textContent = "Mark Absent";
+                toggleBtn.className = "attendance-status-btn attendance-btn-absent";
+            } else {
+                statusValue.textContent = "Absent";
+                statusValue.className = "attendance-status-absent";
+                toggleBtn.textContent = "Mark Present";
+                toggleBtn.className = "attendance-status-btn attendance-btn-present";
+            }
+        }
+
+        updateUI();
+
+        toggleBtn.addEventListener("click", () => {
+            if (status === "Present") {
+                const reason = prompt("Reason for absence?");
+                if (!reason) return;
+                status = "Absent";
+                updateUI();
+                submitAttendance(event, eventType, memberName, status, reason);
+            } else {
+                status = "Present";
+                updateUI();
+                submitAttendance(event, eventType, memberName, status, "");
+            }
+        });
+
+        statusLabel.textContent = "Status: ";
+
+        row.appendChild(nameEl);
+        row.appendChild(statusLabel);
+        row.appendChild(statusValue);
+        row.appendChild(toggleBtn);
+
+        membersContainer.appendChild(row);
+    });
+
+    card.appendChild(titleEl);
+    card.appendChild(timeEl);
+    card.appendChild(membersContainer);
+
+    return card;
+}
+
+// Send attendance record to Google Sheets via Apps Script
+function submitAttendance(event, eventType, memberName, status, reason) {
+    const payload = {
+        formType: "attendance",
+        eventName: event.title,
+        eventType: eventType,
+        memberName: memberName,
+        status: status,
+        reason: reason,
+        timestamp: new Date().toISOString()
+    };
+
+    fetch(WEB_APP_URL, {
+        method: "POST",
+        body: JSON.stringify(payload)
+    }).catch(() => {
+        // Silent fail; you can add alert if you want
+    });
+}
+
 // Default page on load
 checkPassword();
 loadPage(renderDashboard, dashboardBtn);
