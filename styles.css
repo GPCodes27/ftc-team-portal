@@ -593,3 +593,31 @@ body {
         gap: 15px;
     }
 }
+
+/* ===== Make STATUS dominant and BUTTONS subtle ===== */
+
+/* Status text: bigger, bolder, more color */
+.attendance-status-present {
+    color: #2ecc71 !important;   /* bright green */
+    font-weight: 700 !important;
+    font-size: 16px !important;
+}
+
+.attendance-status-absent {
+    color: #e74c3c !important;   /* bright red */
+    font-weight: 700 !important;
+    font-size: 16px !important;
+}
+
+/* Buttons: smaller, dimmer, secondary */
+.attendance-status-btn {
+    font-size: 11px !important;
+    padding: 3px 6px !important;
+    opacity: 0.55 !important;
+    transition: opacity 0.15s ease;
+}
+
+.attendance-status-btn:hover {
+    opacity: 1 !important;
+}
+
