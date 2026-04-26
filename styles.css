@@ -483,3 +483,105 @@ body {
     }
 
 }
+/* ===== Attendance Page ===== */
+
+.attendance-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.attendance-section {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
+    text-align: left;
+}
+
+.attendance-section h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.attendance-event-card {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 12px;
+    background-color: #f9f9f9;
+}
+
+.attendance-event-title {
+    font-weight: bold;
+    margin-bottom: 4px;
+}
+
+.attendance-event-time {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.attendance-members {
+    border-top: 1px solid #ddd;
+    padding-top: 8px;
+}
+
+.attendance-member-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.attendance-member-name {
+    flex: 1;
+}
+
+.attendance-status-label {
+    font-weight: bold;
+    margin-right: 6px;
+}
+
+.attendance-status-present {
+    color: #2e7d32;
+}
+
+.attendance-status-absent {
+    color: #c62828;
+}
+
+.attendance-status-btn {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.attendance-btn-present {
+    background-color: #4caf50;
+    color: white;
+}
+
+.attendance-btn-absent {
+    background-color: #e53935;
+    color: white;
+}
+
+.attendance-empty {
+    font-size: 14px;
+    color: #777;
+}
+
+/* Mobile layout for attendance */
+@media (max-width: 700px) {
+    .attendance-layout {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+}
