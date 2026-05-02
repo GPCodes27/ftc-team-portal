@@ -586,6 +586,24 @@ function fetchAttendanceEvents() {
         })
         .catch(() => []);
 }
+// Fetch saved attendance from AttendanceLog sheet
+function fetchAttendanceLog() {
+    return fetch(WEB_APP_URL + "?mode=attendanceLog")
+        .then(res => res.json())
+        .then(data => {
+            if (!Array.isArray(data)) return {};
+            const map = {};
+            data.forEach(row => {
+                const key = (row.EventName || "") + "||" + (row.MemberName || "");
+                map[key] = {
+                    status: row.Status || "",
+                    reason: row.Reason || ""
+                };
+            });
+            return map;
+        })
+        .catch(() => ({}));
+}
 
 // Render attendance UI once data is loaded
 function initAttendancePage() {
@@ -594,9 +612,9 @@ function initAttendancePage() {
 
     if (!meetingsContainer || !eventsContainer) return;
 
-    Promise.all([fetchTeamMembers(), fetchAttendanceEvents()])
-        .then(([members, events]) => {
-            // If no members, use placeholders
+    Promise.all([fetchTeamMembers(), fetchAttendanceEvents(), fetchAttendanceLog()])
+        .then(([members, events, attendanceLog]) => {
+
             if (!members || members.length === 0) {
                 members = ["Member 1", "Member 2", "Member 3"];
             }
@@ -606,31 +624,29 @@ function initAttendancePage() {
 
             events.forEach(ev => {
                 const lower = ev.title.toLowerCase();
-                if (lower.includes("team meeting")) {
+                if (lower.includes("meeting")) {
                     meetings.push(ev);
                 } else {
                     otherEvents.push(ev);
                 }
             });
 
-            // Render meetings
             meetingsContainer.innerHTML = "";
             if (meetings.length === 0) {
                 meetingsContainer.innerHTML = `<p class="attendance-empty">No upcoming team meetings.</p>`;
             } else {
                 meetings.forEach(ev => {
-                    const card = createAttendanceEventCard(ev, members, "Meeting");
+                    const card = createAttendanceEventCard(ev, members, "Meeting", attendanceLog);
                     meetingsContainer.appendChild(card);
                 });
             }
 
-            // Render events
             eventsContainer.innerHTML = "";
             if (otherEvents.length === 0) {
                 eventsContainer.innerHTML = `<p class="attendance-empty">No upcoming events.</p>`;
             } else {
                 otherEvents.forEach(ev => {
-                    const card = createAttendanceEventCard(ev, members, "Event");
+                    const card = createAttendanceEventCard(ev, members, "Event", attendanceLog);
                     eventsContainer.appendChild(card);
                 });
             }
@@ -638,7 +654,7 @@ function initAttendancePage() {
 }
 
 // Create a DOM card for one event with member rows
-function createAttendanceEventCard(event, members, eventType) {
+function createAttendanceEventCard(event, members, eventType, attendanceLog) {
     const card = document.createElement("div");
     card.className = "attendance-event-card";
 
@@ -663,14 +679,18 @@ function createAttendanceEventCard(event, members, eventType) {
 
         const statusLabel = document.createElement("span");
         statusLabel.className = "attendance-status-label";
+        statusLabel.textContent = "Status: ";
 
         const statusValue = document.createElement("span");
-
         const toggleBtn = document.createElement("button");
         toggleBtn.className = "attendance-status-btn";
 
-        // Default status: meetings -> Present, events -> Absent
-        let status = (eventType === "Meeting") ? "Present" : "Absent";
+        // Check saved record first, then fall back to default
+        const logKey = event.title + "||" + memberName;
+        const saved = attendanceLog[logKey];
+        let status = saved
+            ? saved.status
+            : (eventType === "Meeting" ? "Present" : "Absent");
 
         function updateUI() {
             if (status === "Present") {
@@ -701,8 +721,6 @@ function createAttendanceEventCard(event, members, eventType) {
                 submitAttendance(event, eventType, memberName, status, "");
             }
         });
-
-        statusLabel.textContent = "Status: ";
 
         row.appendChild(nameEl);
         row.appendChild(statusLabel);
