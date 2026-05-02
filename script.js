@@ -417,7 +417,7 @@ attendanceBtn.addEventListener("click", () => {
 
 
 //google form stuff
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzCdr5XrQ6Wgss051KYH6RRyTUpQXEluC1pFiPGDgpsEPGmnscK5urv3_7OoJpJrTGwYg/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyXhX-_u0j2Nq5sJk2HGRCIhxSxiM1Wryr9uKYLhJRK4cTHGj4KSn74dao_RA1nkjZe2w/exec";
 
 document.addEventListener("submit", function(e) {
     if (e.target && e.target.id === "supplyForm") {
