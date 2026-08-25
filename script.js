@@ -3,6 +3,9 @@ const TEAM_PASSWORD_HASH = "683af9f25b5f0d48d28cce59a65b58c71e7644cf6765f25498e6
 const ANNOUNCE_PASSWORD_HASH = "d8ccdf7dc72df93b31144b385eaea8594008abdd7e759f0dda8e21120df0f783";
 
 async function checkPassword() {
+    const stored = sessionStorage.getItem("auth");
+    if (stored === TEAM_PASSWORD_HASH) return;
+
     while (true) {
         const entered = prompt("Enter Team Password");
         if (!entered) continue;
@@ -12,7 +15,10 @@ async function checkPassword() {
         const hashArray = Array.from(new Uint8Array(hashBuffer));
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
 
-        if (hashHex === TEAM_PASSWORD_HASH) return;
+        if (hashHex === TEAM_PASSWORD_HASH) {
+            sessionStorage.setItem("auth", hashHex);
+            return;
+        }
         alert("Incorrect password");
     }
 }
