@@ -198,7 +198,7 @@ body {
 
 /* ===== Portfolio Styling ===== */
 
-.portfolio-card{
+.portfolio-card {
     padding: 0;
     overflow: hidden;
 }
@@ -215,10 +215,21 @@ body {
     opacity: 0.85;
 }
 
+.portfolio-slides-container {
+    background-color: #e0e0e0;
+    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    overflow-y: auto;
+}
+
 .portfolio-frame {
-    width: 100%;
-    height: 900px;
+    width: 850px;
+    height: 1100px;
     border: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
     background-color: white;
 }
 
@@ -235,6 +246,13 @@ body {
 
 .portfolio-button:hover {
     background-color: #3569a3;
+}
+
+@media (max-width: 700px) {
+    .portfolio-frame {
+        width: 100%;
+        height: 500px;
+    }
 }
 
 /* ===== Script Styling ===== */
@@ -287,12 +305,21 @@ body {
     text-align: left;
 }
 
+.supply-form label {
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+
 .supply-form input,
 .supply-form textarea {
     padding: 8px;
     border-radius: 6px;
     border: 1px solid #ccc;
     font-size: 14px;
+    background-color: #f9f9f9;
+    color: #111;
 }
 
 .submit-button {
@@ -303,6 +330,8 @@ body {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
 }
 
 .submit-button:hover {
@@ -483,141 +512,3 @@ body {
     }
 
 }
-/* ===== Attendance Page ===== */
-
-.attendance-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 25px;
-    margin-top: 20px;
-}
-
-.attendance-section {
-    background: white;
-    padding: 20px;
-    border-radius: 12px;
-    box-shadow: 0 8px 18px rgba(0,0,0,0.1);
-    text-align: left;
-}
-
-.attendance-section h3 {
-    margin-top: 0;
-    margin-bottom: 10px;
-}
-
-.attendance-event-card {
-    border: 1px solid #eee;
-    border-radius: 8px;
-    padding: 10px;
-    margin-bottom: 12px;
-    background-color: #f9f9f9;
-}
-
-.attendance-event-title {
-    font-weight: bold;
-    margin-bottom: 4px;
-}
-
-.attendance-event-time {
-    font-size: 13px;
-    color: #555;
-    margin-bottom: 8px;
-}
-
-.attendance-members {
-    border-top: 1px solid #ddd;
-    padding-top: 8px;
-}
-
-.attendance-member-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
-    gap: 8px;
-    font-size: 14px;
-}
-
-/* Make the status visually dominant */
-.attendance-status-label {
-    font-weight: bold;
-    margin-right: 4px;
-}
-
-.attendance-status-present {
-    font-weight: bold;
-    color: #2e7d32;
-    font-size: 15px;
-}
-
-.attendance-status-absent {
-    font-weight: bold;
-    color: #c62828;
-    font-size: 15px;
-}
-
-/* Make the buttons subtle */
-.attendance-status-btn {
-    padding: 3px 6px;
-    border-radius: 6px;
-    border: none;
-    cursor: pointer;
-    font-size: 11px;
-    opacity: 0.7;
-    transition: opacity 0.15s ease;
-}
-
-.attendance-status-btn:hover {
-    opacity: 1;
-}
-
-.attendance-btn-present {
-    background-color: #4caf50;
-    color: white;
-}
-
-.attendance-btn-absent {
-    background-color: #e53935;
-    color: white;
-}
-
-.attendance-empty {
-    font-size: 14px;
-    color: #777;
-}
-
-/* Mobile layout */
-@media (max-width: 700px) {
-    .attendance-layout {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
-}
-
-/* ===== Make STATUS dominant and BUTTONS subtle ===== */
-
-/* Status text: bigger, bolder, more color */
-.attendance-status-present {
-    color: #2ecc71 !important;   /* bright green */
-    font-weight: 700 !important;
-    font-size: 16px !important;
-}
-
-.attendance-status-absent {
-    color: #e74c3c !important;   /* bright red */
-    font-weight: 700 !important;
-    font-size: 16px !important;
-}
-
-/* Buttons: smaller, dimmer, secondary */
-.attendance-status-btn {
-    font-size: 11px !important;
-    padding: 3px 6px !important;
-    opacity: 0.55 !important;
-    transition: opacity 0.15s ease;
-}
-
-.attendance-status-btn:hover {
-    opacity: 1 !important;
-}
-
