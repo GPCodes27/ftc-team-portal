@@ -1,5 +1,21 @@
 const API_KEY = 'AIzaSyD-umZd1axooWwfjJRJm03TQfq8ugMoy9c';
-const TEAM_PASSWORD = "foxbots25657";
+const TEAM_PASSWORD_HASH = "683af9f25b5f0d48d28cce59a65b58c71e7644cf6765f25498e66f9e9c2dc016";
+const ANNOUNCE_PASSWORD_HASH = "d8ccdf7dc72df93b31144b385eaea8594008abdd7e759f0dda8e21120df0f783";
+
+async function checkPassword() {
+    while (true) {
+        const entered = prompt("Enter Team Password");
+        if (!entered) continue;
+
+        const encoded = new TextEncoder().encode(entered);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        if (hashHex === TEAM_PASSWORD_HASH) return;
+        alert("Incorrect password");
+    }
+}
 // ================= NAV SETUP =================
 
 const dashboardBtn = document.getElementById("dashboardBtn");
@@ -8,8 +24,9 @@ const filesBtn = document.getElementById("filesBtn");
 const portfolioBtn = document.getElementById("portfolioBtn");
 const scriptBtn = document.getElementById("scriptBtn");
 const ordersBtn = document.getElementById("ordersBtn");
+const announceBtn = document.getElementById("announceBtn");
 
-const navButtons = [dashboardBtn, calendarBtn, filesBtn, portfolioBtn, scriptBtn, ordersBtn];
+const navButtons = [dashboardBtn, calendarBtn, filesBtn, portfolioBtn, scriptBtn, ordersBtn, announceBtn];
 
 const content = document.getElementById("content");
 
@@ -55,23 +72,15 @@ function createFileCard(title, description, link) {
 function renderDashboard() {
     return `
         <h2 id="page-title">Dashboard</h2>
-
         <div class="dashboard-grid">
-
             <div class="dashboard-card">
                 <h3>Week Coming Up</h3>
-                <div id="upcomingEvents">
-                    Loading events...
-                </div>
+                <div id="upcomingEvents">Loading events...</div>
             </div>
-
             <div class="dashboard-card">
-                <h3>Supply Requests</h3>
-                <div id="requestStatus">
-                    Loading requests...
-                </div>
+                <h3>Announcements</h3>
+                <div id="dashAnnouncements">Loading...</div>
             </div>
-
         </div>
     `;
 }
@@ -169,32 +178,29 @@ function renderPortfolio() {
 
 function renderOrders() {
     return `
-        <h2 id="page-title">Request Supplies</h2>
+        <h2 id="page-title">Orders</h2>
+
+        <div class="dashboard-card" style="margin-bottom: 25px;">
+            <h3>Supply Requests</h3>
+            <div id="requestStatus">Loading requests...</div>
+        </div>
 
         <div class="card request-card">
+            <h3 style="color:white; text-align:left; margin-top:0;">Request Supplies</h3>
             <form id="supplyForm" class="supply-form">
-                
                 <label>Your Name</label>
                 <input type="text" id="name" required>
-
                 <label>Item Name</label>
                 <input type="text" id="item" required>
-
                 <label>Quantity</label>
                 <input type="number" id="quantity" min="1" required>
-
                 <label>SKU (if applicable)</label>
                 <input type="text" id="sku">
-
                 <label>Price ($)</label>
                 <input type="number" step="0.01" id="price">
-
                 <label>Reason for order</label>
                 <textarea id="reason" rows="3"></textarea>
-
-                <button type="submit" class="submit-button">
-                    Submit Request
-                </button>
+                <button type="submit" class="submit-button">Submit Request</button>
             </form>
         </div>
 
@@ -203,6 +209,27 @@ function renderOrders() {
                 <h3>Request Submitted ✅</h3>
                 <p>Your supply request has been recorded.</p>
                 <button id="closeSuccess">Close</button>
+            </div>
+        </div>
+    `;
+}
+
+function renderAnnouncements() {
+    return `
+        <h2 id="page-title">Announcements</h2>
+
+        <div class="dashboard-card" id="announceList" style="margin-bottom: 25px;">
+            Loading announcements...
+        </div>
+
+        <div class="card">
+            <h3 style="color:white; text-align:left; margin-top:0;">Post Announcement</h3>
+            <div class="supply-form">
+                <label>Title</label>
+                <input type="text" id="announceTitle">
+                <label>Message</label>
+                <textarea id="announceBody" rows="4"></textarea>
+                <button class="submit-button" id="announceSubmit">Post</button>
             </div>
         </div>
     `;
@@ -239,18 +266,15 @@ function renderScript() {
 // ================= PAGE LOADER =================
 
 function loadPage(renderFunction, activeButton) {
-
     content.innerHTML = renderFunction();
-
-    navButtons.forEach(button => {
-        button.classList.remove("active");
-    });
-
+    navButtons.forEach(button => button.classList.remove("active"));
     activeButton.classList.add("active");
 
-    // If dashboard is loaded, fetch data
     if (renderFunction === renderDashboard) {
         loadUpcomingEvents();
+        loadDashAnnouncements();
+    }
+    if (renderFunction === renderOrders) {
         loadSupplyRequests();
     }
 }
@@ -370,12 +394,17 @@ ordersBtn.addEventListener("click", () => {
     loadPage(renderOrders, ordersBtn);
 });
 
+announceBtn.addEventListener("click", () => {
+    loadPage(renderAnnouncements, announceBtn);
+    loadAnnouncements();
+});
+
 scriptBtn.addEventListener("click", () => {
     loadPage(renderScript, scriptBtn);
 });
 
 //google form stuff
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxL7I_aWeyeFm-kxzol4VwjDUHPquiuYZDG7QE-ZsIatmT6iaiY0I4Wqc788J6yeyT6KQ/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwo4pv4lfdvjTC4y6S8qr-ah_ZUzItcAM9mFvjCksSYavdjLkVdLcr1HJH-nYBjNZP01A/exec";
 
 document.addEventListener("submit", function(e) {
     if (e.target && e.target.id === "supplyForm") {
@@ -409,6 +438,39 @@ document.addEventListener("submit", function(e) {
 document.addEventListener("click", function(e) {
     if (e.target && e.target.id === "closeSuccess") {
         document.getElementById("successModal").classList.add("hidden");
+    }
+});
+
+document.addEventListener("click", async function(e) {
+    if (e.target && e.target.id === "announceSubmit") {
+        const title = document.getElementById("announceTitle").value.trim();
+        const body = document.getElementById("announceBody").value.trim();
+        if (!title || !body) { alert("Please fill in both fields."); return; }
+
+        const entered = prompt("Captain password required:");
+        if (!entered) return;
+
+        const encoded = new TextEncoder().encode(entered);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        if (hashHex !== ANNOUNCE_PASSWORD_HASH) {
+            alert("Incorrect password.");
+            return;
+        }
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify({ sheet: "announcements", title, body })
+        })
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("announceTitle").value = "";
+            document.getElementById("announceBody").value = "";
+            loadAnnouncements();
+        })
+        .catch(() => alert("Error posting announcement."));
     }
 });
 
@@ -501,7 +563,139 @@ function loadSupplyRequests() {
             });
         });
 }
-// Default page on load
-checkPassword();
-loadPage(renderDashboard, dashboardBtn);
 
+function loadAnnouncements() {
+    fetch(WEB_APP_URL + "?sheet=announcements")
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("announceList");
+            container.innerHTML = "<h3 style='margin-top:0;'>Announcements</h3>";
+
+            const now = new Date();
+            const twoDays = 2 * 24 * 60 * 60 * 1000;
+            const tenDays = 10 * 24 * 60 * 60 * 1000;
+            const twoMonths = 60 * 24 * 60 * 60 * 1000;
+
+            const recent = [];
+            const older = [];
+
+            data.forEach(a => {
+                const age = now - new Date(a.Timestamp);
+                if (age <= twoMonths) {
+                    if (age <= twoDays) a._badge = "NEW";
+                    else if (age <= tenDays) a._badge = "RECENT";
+                    recent.push(a);
+                } else {
+                    older.push(a);
+                }
+            });
+
+            if (recent.length === 0 && older.length === 0) {
+                container.innerHTML += "<p>No announcements yet.</p>";
+                return;
+            }
+
+            recent.forEach(a => {
+                const date = new Date(a.Timestamp);
+                const div = document.createElement("div");
+                div.className = "dashboard-item";
+                div.innerHTML = `
+                    ${a._badge ? `<span class="announce-badge${a._badge === 'RECENT' ? ' recent' : ''}">${a._badge}</span> ` : ''}
+                    <strong>${a.Title}</strong><br>
+                    <span style="font-size:13px; color:#555;">${date.toLocaleDateString()}</span>
+                    <p style="margin: 6px 0 0;">${a.Body}</p>
+                `;
+                container.appendChild(div);
+            });
+
+            if (older.length > 0) {
+                const toggle = document.createElement("button");
+                toggle.className = "older-toggle";
+                toggle.textContent = `Show ${older.length} older announcement${older.length > 1 ? 's' : ''}`;
+
+                const olderDiv = document.createElement("div");
+                olderDiv.style.display = "none";
+                olderDiv.style.marginTop = "10px";
+
+                older.forEach(a => {
+                    const date = new Date(a.Timestamp);
+                    const div = document.createElement("div");
+                    div.className = "dashboard-item";
+                    div.innerHTML = `
+                        <strong>${a.Title}</strong><br>
+                        <span style="font-size:13px; color:#555;">${date.toLocaleDateString()}</span>
+                        <p style="margin: 6px 0 0;">${a.Body}</p>
+                    `;
+                    olderDiv.appendChild(div);
+                });
+
+                toggle.addEventListener("click", () => {
+                    const hidden = olderDiv.style.display === "none";
+                    olderDiv.style.display = hidden ? "block" : "none";
+                    toggle.textContent = hidden
+                        ? "Hide older announcements"
+                        : `Show ${older.length} older announcement${older.length > 1 ? 's' : ''}`;
+                });
+
+                container.appendChild(toggle);
+                container.appendChild(olderDiv);
+            }
+        });
+}
+
+function loadDashAnnouncements() {
+    fetch(WEB_APP_URL + "?sheet=announcements")
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("dashAnnouncements");
+            container.innerHTML = "";
+
+            const now = new Date();
+            const twoDays = 2 * 24 * 60 * 60 * 1000;
+            const tenDays = 10 * 24 * 60 * 60 * 1000;
+
+            const visible = data.filter(a => (now - new Date(a.Timestamp)) <= tenDays);
+
+            if (visible.length === 0) {
+                container.innerHTML = "<p>No recent announcements.</p>";
+                return;
+            }
+
+            const shown = visible.slice(0, 2);
+            const remaining = visible.length - 2;
+
+            shown.forEach(a => {
+                const date = new Date(a.Timestamp);
+                const age = now - date;
+                const badge = age <= twoDays ? "NEW" : "RECENT";
+                const div = document.createElement("div");
+                div.className = "dashboard-item";
+                div.innerHTML = `
+                    <span class="announce-badge${badge === 'RECENT' ? ' recent' : ''}">${badge}</span>
+                    <strong>${a.Title}</strong><br>
+                    <span style="font-size:13px; color:#555;">${date.toLocaleDateString()}</span>
+                    <p style="margin: 6px 0 0;">${a.Body}</p>
+                `;
+                container.appendChild(div);
+            });
+
+            if (remaining > 0) {
+                const div = document.createElement("div");
+                div.style.marginTop = "10px";
+                div.style.fontSize = "13px";
+                div.style.cursor = "pointer";
+                div.style.paddingTop = "10px";
+                div.style.borderTop = "1px solid #eee";
+                div.innerHTML = `<a style="color:#4c8cd5;">+${remaining} more announcement${remaining > 1 ? 's' : ''}</a>`;
+                div.addEventListener("click", () => {
+                    loadPage(renderAnnouncements, announceBtn);
+                    loadAnnouncements();
+                });
+                container.appendChild(div);
+            }
+        });
+}
+
+// Default page on load
+loadPage(renderDashboard, dashboardBtn);
+checkPassword();
