@@ -417,22 +417,54 @@ body {
 }
 
 .status-pending {
-    color: #ff9800;
+    color: #888888;
     font-weight: bold;
 }
 
 .status-ordered {
-    color: #21f32f;
+    color: #12b2cb;
     font-weight: bold;
 }
 
 .status-received {
-    color: #e0ce29;
+    color: #c7b722;
     font-weight: bold;
 }
 .status-delivered {
-    color: #888888;
+    color: #038705;
     font-weight: bold;
+}
+
+.announce-badge {
+    display: inline-block;
+    background-color: #00c0ce;
+    color: white;
+    font-size: 11px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 4px;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
+.older-toggle {
+    margin-top: 10px;
+    padding: 4px 10px;
+    background: none;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    color: #888;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.older-toggle:hover {
+    color: #555;
+    border-color: #777;
+}
+
+.announce-badge.recent {
+    background-color: #888;
 }
 
 /* ===== MOBILE FIX ===== */
