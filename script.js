@@ -124,31 +124,27 @@ function renderFiles() {
         <h2 id="page-title">Team Files</h2>
 
         <div class="files-grid">
+            ${createFileCard("Code Backups", "Upload robot code, configuration files, and zip backups.", "https://drive.google.com/drive/folders/1B8cSosZadzsbU6D_tnSVnWQwe7mK7Yey?usp=share_link")}
+            ${createFileCard("CAD Files", "STEP files, exports, and mechanical designs.", "https://drive.google.com/drive/folders/177nFqM0VFN9i1jJphU3BGWyGrJACoJsP?usp=share_link")}
+            ${createFileCard("Outreach Files", "Flyers, presentations, and sponsor materials.", "https://drive.google.com/drive/folders/1b-MEAWvLH4Hdw1HQ4t1Rqd1X7XLNpGnC?usp=share_link")}
+            ${createFileCard("Photos + Videos", "Event photos, robot pictures, documentation, and match videos.", "https://drive.google.com/drive/folders/1x7mltQYSjQnjsxcYiflprPFzFxWgfMka?usp=share_link")}
+        </div>
 
-            ${createFileCard(
-                "Code Backups",
-                "Upload robot code, configuration files, and zip backups.",
-                "https://drive.google.com/drive/folders/1B8cSosZadzsbU6D_tnSVnWQwe7mK7Yey?usp=share_link"
-            )}
+        <div class="dashboard-card" id="linksList" style="margin-top: 25px;">
+            Loading links...
+        </div>
 
-            ${createFileCard(
-                "CAD Files",
-                "STEP files, exports, and mechanical designs.",
-                "https://drive.google.com/drive/folders/177nFqM0VFN9i1jJphU3BGWyGrJACoJsP?usp=share_link"
-            )}
-
-            ${createFileCard(
-                "Outreach Files",
-                "Flyers, presentations, and sponsor materials.",
-                "https://drive.google.com/drive/folders/1b-MEAWvLH4Hdw1HQ4t1Rqd1X7XLNpGnC?usp=share_link"
-            )}
-
-            ${createFileCard(
-                "Photos + Videos",
-                "Event photos, robot pictures, documentation, and match videos.",
-                "https://drive.google.com/drive/folders/1x7mltQYSjQnjsxcYiflprPFzFxWgfMka?usp=share_link"
-            )}
-
+        <div class="card" style="margin-top: 25px;">
+            <h3 style="color:white; text-align:left; margin-top:0;">Add Link</h3>
+            <div class="supply-form">
+                <label>Title</label>
+                <input type="text" id="linkTitle">
+                <label>Description</label>
+                <input type="text" id="linkDescription">
+                <label>URL</label>
+                <input type="url" id="linkURL" placeholder="https://">
+                <button class="submit-button" id="linkSubmit">Add Link</button>
+            </div>
         </div>
     `;
 }
@@ -283,6 +279,9 @@ function loadPage(renderFunction, activeButton) {
     if (renderFunction === renderOrders) {
         loadSupplyRequests();
     }
+    if (renderFunction === renderFiles) {
+        loadLinks();
+    }
 }
 
 
@@ -405,12 +404,14 @@ announceBtn.addEventListener("click", () => {
     loadAnnouncements();
 });
 
+
+
 scriptBtn.addEventListener("click", () => {
     loadPage(renderScript, scriptBtn);
 });
 
 //google form stuff
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwo4pv4lfdvjTC4y6S8qr-ah_ZUzItcAM9mFvjCksSYavdjLkVdLcr1HJH-nYBjNZP01A/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzg8R3BFaSX4MWGl-cYUr1hJCaSAdMtvRSwcCjHFr8zSmJlwcN-jESviJMcfwnltJ6M/exec";
 
 document.addEventListener("submit", function(e) {
     if (e.target && e.target.id === "supplyForm") {
@@ -477,6 +478,42 @@ document.addEventListener("click", async function(e) {
             loadAnnouncements();
         })
         .catch(() => alert("Error posting announcement."));
+    }
+});
+
+document.addEventListener("click", async function(e) {
+    if (e.target && e.target.id === "linkSubmit") {
+        const title = document.getElementById("linkTitle").value.trim();
+        const description = document.getElementById("linkDescription").value.trim();
+        const url = document.getElementById("linkURL").value.trim();
+
+        if (!title || !url) { alert("Title and URL are required."); return; }
+
+        const entered = prompt("Captain password required:");
+        if (!entered) return;
+
+        const encoded = new TextEncoder().encode(entered);
+        const hashBuffer = await crypto.subtle.digest("SHA-256", encoded);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+
+        if (hashHex !== ANNOUNCE_PASSWORD_HASH) {
+            alert("Incorrect password.");
+            return;
+        }
+
+        fetch(WEB_APP_URL, {
+            method: "POST",
+            body: JSON.stringify({ sheet: "links", title, description, url })
+        })
+        .then(res => res.json())
+        .then(() => {
+            document.getElementById("linkTitle").value = "";
+            document.getElementById("linkDescription").value = "";
+            document.getElementById("linkURL").value = "";
+            loadLinks();
+        })
+        .catch(() => alert("Error adding link."));
     }
 });
 
@@ -646,6 +683,30 @@ function loadAnnouncements() {
                 container.appendChild(toggle);
                 container.appendChild(olderDiv);
             }
+        });
+}
+
+function loadLinks() {
+    fetch(WEB_APP_URL + "?sheet=links")
+        .then(res => res.json())
+        .then(data => {
+            const container = document.getElementById("linksList");
+            container.innerHTML = "<h3 style='margin-top:0;'>Team Links</h3>";
+
+            if (!data.length) {
+                container.innerHTML += "<p>No links yet.</p>";
+                return;
+            }
+
+            data.forEach(link => {
+                const div = document.createElement("div");
+                div.className = "dashboard-item";
+                div.innerHTML = `
+                    <strong><a href="${link.URL}" target="_blank" style="color:#4c8cd5;">${link.Title}</a></strong><br>
+                    <span style="font-size:13px; color:#555;">${link.Description}</span>
+                `;
+                container.appendChild(div);
+            });
         });
 }
 
