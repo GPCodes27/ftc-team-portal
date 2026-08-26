@@ -532,7 +532,7 @@ function loadSupplyRequests() {
             container.innerHTML = "";
 
             if (!data.length) {
-                container.innerHTML = "<p>No requests yet.</p>";
+                container.innerHTML = "<p>No requests right now.</p>";
                 return;
             }
 
