@@ -411,7 +411,7 @@ scriptBtn.addEventListener("click", () => {
 });
 
 //google form stuff
-const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzg8R3BFaSX4MWGl-cYUr1hJCaSAdMtvRSwcCjHFr8zSmJlwcN-jESviJMcfwnltJ6M/exec";
+const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwTrtODCvtsPKR8AVfnW3NolPz7X4859uvMc3HnJ4fre19cyz5B5ny4ehpZ7iO-kPst/exec";
 
 document.addEventListener("submit", function(e) {
     if (e.target && e.target.id === "supplyForm") {
